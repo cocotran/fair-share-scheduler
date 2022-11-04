@@ -1,2 +1,2 @@
 # fair-share-scheduler
-#python main.py to run
+python main.py to run

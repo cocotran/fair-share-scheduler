@@ -64,13 +64,13 @@ class Scheduler:
     def execute(self, process):
         # thread has started its execution
         if process.state is None:
-            self.print_to_file(process, 'Started')
-            self.print_to_file(process, 'Resumed')
+            self.write_to_output(process, 'Started')
+            self.write_to_output(process, 'Resumed')
             self._time_start = time.perf_counter()
         # paused thread has resumed execution
         elif process.state == 'Paused':
             process.state = 'Resumed'
-            self.print_to_file(process, 'Resumed')
+            self.write_to_output(process, 'Resumed')
             self._time_start = time.perf_counter()
 
         while True:
@@ -89,8 +89,8 @@ class Scheduler:
 
         # if the process is finished executing, report the finished status to output
         if process.time_left <= 0:
-            self.print_to_file(process, 'Paused')
-            self.print_to_file(process, 'Finished')
+            self.write_to_output(process, 'Paused')
+            self.write_to_output(process, 'Finished')
 
             # decrement the number of running processes for the users_dict
             self._users_dict[process.user_id] -= 1
@@ -102,7 +102,7 @@ class Scheduler:
         # if the process needs more time to execute, set its state to 'Paused' and add it back to the ready queue
         else:
             process.state = 'Paused'
-            self.print_to_file(process, 'Paused')
+            self.write_to_output(process, 'Paused')
             # Send paused process to back of ready_queue
             self._ready_queue.append(process)
 
