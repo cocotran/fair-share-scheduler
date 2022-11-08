@@ -1,53 +1,76 @@
-class Process:
+from threading import Thread
 
-    # default constructor
-    def __init__(self, user: str, pid: int, ready_t: int, service_t: int):
-        # User process
-        self._user_id = user
-        self._process_id = pid
-        self._quantum = 0
-        self._ready_time = ready_t
-        self._time_left = service_t
-        # process state
-        self._state = None
 
-    #Getters
-    
-    @property           #creating read-only properties using property() as a decorator
-    def user_id(self):
-        return self._user_id
+class Process(Thread):
+    def __init__(self, id: str, arrive_time: int, quantum_time: int, user=None) -> None:
+        Thread.__init__(self)
+        self.id = id
+        self.arrive_time = arrive_time
+        self._quantum_time = quantum_time
+        self.state = "not ready"
+        self._user = user
 
-    @property
-    def process_id(self):
-        return self._process_id
+    def __repr__(self) -> str:
+        return f"Process{self.id}: {self._quantum_time}-{self.state}"
 
-    @property
-    def quantum(self):
-        return self._quantum
+    def set_user(self, user):
+        self._user = user
 
-    @property
-    def ready_time(self):
-        return self._ready_time
+    def execute(self, current_time: int, step=1):
+        if self._quantum_time > 0:
+            if self.state == "ready":
+                self.state = "started"
+                self.log(current_time)
+            elif self.state == "paused":
+                self.state = "resumed"
+                self.log(current_time)
 
-    @property
-    def time_left(self):
-        return self._time_left
+            self._quantum_time -= step
 
-    @property
-    def state(self):
-        return self._state
+        if self._quantum_time <= 0:
+            self.state = "finished"
+            self._user.remove_process(self.id)
+            self.log(current_time + 1)
 
-    #Setters
-    
-    def set_quantum(self, new_quantum):
-        self._quantum = new_quantum
+    def pause(self, current_time):
+        self.state = "paused"
+        self.log(current_time)
 
-    @time_left.setter
-    def time_left(self, time):
-        self._time_left = time
+    def log(self, current_time: int) -> None:
+        print(
+            f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
+        )
 
-    @state.setter
-    def state(self, new_state):
-        self._state = new_state
 
-   
+class User(Thread):
+    def __init__(self, name: str, processes=[]) -> None:
+        Thread.__init__(self)
+        self.name = name
+        self.processes = processes
+        self.process_queue = []
+
+    def __repr__(self) -> str:
+        return self.name
+
+    def set_process(self, processes):
+        self.processes = processes
+        for process in self.processes:
+            process.set_user(self)
+
+    def update(self, message):
+        for process in self.processes:
+            if message == process.arrive_time:
+                self.update_queue(process)
+                self.processes.remove(process)
+
+    def has_ready_process(self) -> bool:
+        return len(self.process_queue) > 0
+
+    def update_queue(self, process: Process) -> None:
+        self.process_queue.append(process)
+        process.state = "ready"
+
+    def remove_process(self, process_id):
+        for process in self.process_queue:
+            if process.id == process_id:
+                self.process_queue.remove(process)
