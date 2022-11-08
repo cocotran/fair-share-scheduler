@@ -10,10 +10,10 @@ class Clock(Publisher, Thread):
         self._secs = secs
         self._step = 1
         self._running = False
-        self.current_time = 1  # stated in A2 description
+        self.current_time = 0
         Thread.__init__(self)
 
-    def start(self) -> None:
+    def run(self):
         self.dispatch(self.current_time)
         self._running = True
         while self._running:

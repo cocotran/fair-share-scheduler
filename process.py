@@ -1,8 +1,9 @@
-from observable import Subscriber
+from threading import Thread
 
 
-class Process:
+class Process(Thread):
     def __init__(self, id: str, arrive_time: int, quantum_time: int, user=None) -> None:
+        Thread.__init__(self)
         self.id = id
         self.arrive_time = arrive_time
         self._quantum_time = quantum_time
@@ -15,7 +16,7 @@ class Process:
     def set_user(self, user):
         self._user = user
 
-    def run(self, current_time: int, step=1):
+    def execute(self, current_time: int, step=1):
         if self._quantum_time > 0:
             if self.state == "ready":
                 self.state = "started"
@@ -24,23 +25,26 @@ class Process:
                 self.state = "resumed"
                 self.log(current_time)
 
-            self._quantum_time -= step 
+            self._quantum_time -= step
 
         if self._quantum_time <= 0:
             self.state = "finished"
             self._user.remove_process(self.id)
-            self.log(current_time+1)
+            self.log(current_time + 1)
 
     def pause(self, current_time):
         self.state = "paused"
         self.log(current_time)
 
     def log(self, current_time: int) -> None:
-        print(f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}")
+        print(
+            f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
+        )
 
 
-class User():
+class User(Thread):
     def __init__(self, name: str, processes=[]) -> None:
+        Thread.__init__(self)
         self.name = name
         self.processes = processes
         self.process_queue = []
