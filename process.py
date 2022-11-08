@@ -40,7 +40,7 @@ class Process(Thread):
         msg = f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
         print(msg)
         with open("output.txt", "a") as f:
-            f.write(msg)
+            f.write(msg + "\n")
             f.close()
 
 
