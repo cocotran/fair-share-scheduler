@@ -42,6 +42,7 @@ def get_users_and_processes(input_data):
 
 if __name__ == "__main__":
     # Get input from file
+    open('output.txt', 'w').close() # reset
     config = get_raw_input("input.sample.txt")
     quantum_time, input_data = get_input_from_file(config)
     user_threads, all_threads = get_users_and_processes(input_data)

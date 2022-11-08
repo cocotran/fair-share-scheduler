@@ -37,9 +37,11 @@ class Process(Thread):
         self.log(current_time)
 
     def log(self, current_time: int) -> None:
-        print(
-            f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
-        )
+        msg = f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
+        print(msg)
+        with open("output.txt", "a") as f:
+            f.write(msg)
+            f.close()
 
 
 class User(Thread):
