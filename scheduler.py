@@ -37,6 +37,9 @@ class Scheduler(Subscriber, Thread):
             self._process_queue.pop(0)
         elif process.state == "finished":
             self._process_queue.pop(0)
+            if item["time"] > 0:    # if not all allocated time is used
+                self.update_user_queue(message)
+                self.calculate_time()   # force new cycle
 
     def update_user_queue(self, current_time: int) -> None:
         self._user_queue = []  # reset
