@@ -3,16 +3,18 @@ from threading import Thread
 from clock import Clock
 from observable import Subscriber
 
-
+# class used to handle the fair-share process scheduling
 class Scheduler(Subscriber, Thread):
     def __init__(self, quantum: int, clock: Clock, name: str, user=[]) -> None:
         Thread.__init__(self)
         Subscriber.__init__(self, name)
         clock.register(self)
         self._clock = clock
+        # holds quantum value
         self._quantum = quantum
         self._users = user
-        self._user_queue = []  # list of Users with ready processes
+        # list of Users with ready processes
+        self._user_queue = [] 
         self._process_queue = []
 
     def update(self, message):
@@ -41,13 +43,14 @@ class Scheduler(Subscriber, Thread):
                 self.update_user_queue(message)
                 self.calculate_time()   # force new cycle
 
+  # check if a new process needs to be added to ready queue 
     def update_user_queue(self, current_time: int) -> None:
         self._user_queue = []  # reset
         for user in self._users:
             user.update(current_time)
             if user.has_ready_process():
                 self._user_queue.append(user)
-
+# update the quantum of each process remaining in the ready queue
     def calculate_time(self) -> None:
         self._process_queue = []  # reset
         if len(self._user_queue):

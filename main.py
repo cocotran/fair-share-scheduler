@@ -3,7 +3,7 @@ from scheduler import Scheduler
 from process import Process, User
 from scheduler import Scheduler
 
-
+#open input.sample.txt file
 def get_raw_input(file_name: str):
     with open(file_name, "r") as f:
         arr = [line.strip() for line in f.readlines()]
@@ -13,6 +13,7 @@ def get_raw_input(file_name: str):
 
 def get_input_from_file(arr):
     config = {}
+    #Get the time quantum of the program
     quantum_time = int(arr.pop(0))
     while arr:
         user = arr[0][0]
@@ -23,13 +24,14 @@ def get_input_from_file(arr):
             config[user].append(arr.pop(0))
     return quantum_time, config
 
-
+# store the user _threads and processes threads in their respective variables
 def get_users_and_processes(input_data):
     user_threads = []
     processes_threads = []
     for user in input_data.keys():
         user_thread = User(user)
         processes_thread = []
+        # count used to traverse  list of process specifications
         count = 0
         for p in input_data[user]:
             processes_thread.append(Process(count, int(p[0]), int(p[2])))
@@ -41,7 +43,7 @@ def get_users_and_processes(input_data):
 
 
 if __name__ == "__main__":
-    # Get input from file
+    # initialize the output file for writing
     open('output.txt', 'w').close() # reset
     config = get_raw_input("input.sample.txt")
     quantum_time, input_data = get_input_from_file(config)
@@ -50,6 +52,7 @@ if __name__ == "__main__":
     # Set up
     clock = Clock(0.5)
     scheduler = Scheduler(quantum_time, clock, "Scheduler", user_threads)
+     # run the scheduler & clock
     clock.start()
     scheduler.start()
     for t in all_threads:

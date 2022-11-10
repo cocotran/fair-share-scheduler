@@ -1,12 +1,16 @@
 from threading import Thread
 
-
+# default constructor
 class Process(Thread):
     def __init__(self, id: str, arrive_time: int, quantum_time: int, user=None) -> None:
         Thread.__init__(self)
+        # process number
         self.id = id
+        # time at which the process arrives
         self.arrive_time = arrive_time
+        # amount of quantum time allocated to process
         self._quantum_time = quantum_time
+         # process state
         self.state = "not ready"
         self._user = user
 
@@ -15,12 +19,14 @@ class Process(Thread):
 
     def set_user(self, user):
         self._user = user
-
+     #Execution of processes
     def execute(self, current_time: int, step=1):
+        # thread has started its execution
         if self._quantum_time > 0:
             if self.state == "ready":
                 self.state = "started"
                 self.log(current_time)
+                # paused thread has resumed execution
             elif self.state == "paused":
                 self.state = "resumed"
                 self.log(current_time)
@@ -35,7 +41,7 @@ class Process(Thread):
     def pause(self, current_time):
         self.state = "paused"
         self.log(current_time)
-
+      # print output message to file
     def log(self, current_time: int) -> None:
         msg = f"Time {current_time}, User {self._user}, Process {self.id}, {self.state}"
         print(msg)
